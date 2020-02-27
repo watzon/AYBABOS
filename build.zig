@@ -3,9 +3,9 @@ const Builder = @import("std").build.Builder;
 
 pub fn build(b: *Builder) void {
     const mode = b.standardReleaseOptions();
-    const exe = b.addExecutable("aybabos-i386.bin", "./src/kernel/arch/i386/boot/boot.zig");
+    const exe = b.addExecutable("aybabos-i386.bin", "src/kernel/arch/i386/boot/main.zig");
 
-    exe.setLinkerScriptPath("./src/kernel/linker.ld");
+    exe.setLinkerScriptPath("src/kernel/arch/i386/boot/setup.ld");
     exe.setTarget(.i386, .freestanding, .none);
     // exe.addPackagePath("drivers", "./src/drivers.zig");
     exe.addPackagePath("kernel", "./src/kernel.zig");
