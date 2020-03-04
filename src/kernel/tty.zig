@@ -62,3 +62,7 @@ pub fn putChar(c: u8) void {
 pub fn write(data: []const u8) void {
     for (data) |c| putChar(c);
 }
+
+pub fn writeByte(byte: u8) void {
+    putChar(byte);
+}

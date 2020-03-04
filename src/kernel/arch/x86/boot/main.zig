@@ -69,6 +69,8 @@ pub fn panic(msg: []const u8, error_return_trace: ?*builtin.StackTrace) noreturn
 
 pub fn kmain() callconv(.C) noreturn {
     tty.reset();
-    tty.write("Hello, kernel World!\n");
+    tty.write("Hello, kernel World! ");
+    tty.putChar(byte);
+    tty.write("\n");
     while (true) {}
 }
