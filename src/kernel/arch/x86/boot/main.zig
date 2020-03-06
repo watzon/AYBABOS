@@ -1,7 +1,11 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const kernel = @import("kernel");
-const tty = kernel.tty;
+const Terminal = @import("tty.zig");
+const SerialPort = @import("serial-port.zig");
+const PIC = @import("pic.zig").PIC;
+const gdt = @import("gdt.zig");
+const idt = @import("idt.zig");
+const Keyboard = @import("./keyboard.zig");
 
 // Exports
 comptime {
@@ -59,18 +63,33 @@ fn start() callconv(.Naked) void {
 
 // Create a new panic function so that we can see what has gone wrong. This
 // defers to kernel.panic.
-pub fn panic(msg: []const u8, error_return_trace: ?*builtin.StackTrace) noreturn {
-    @setCold(true);
-    tty.reset();
-    tty.write("KERNEL PANIC: ");
-    tty.write(msg);
-    while (true) {}
+// pub fn panic(msg: []const u8, error_return_trace: ?*builtin.StackTrace) noreturn {
+//     @setCold(true);
+//     tty.reset();
+//     tty.write("KERNEL PANIC: ");
+//     tty.write(msg);
+//     while (true) {}
+// }
+
+pub fn main() anyerror!void {
+    SerialPort.init(SerialPort.COM1, 9600, .none, .eight);
+    Terminal.clear();
+    PIC.init();
+    idt.init();
+    // gdt.init();
+    // Keyboard.init();
+    Terminal.print("All your {} are belong to {}!\r\n", .{ "base", "us" });
+
+    idt.fireInterrupt(0x40);
+    unreachable;
 }
 
 pub fn kmain() callconv(.C) noreturn {
-    tty.reset();
-    tty.write("Hello, kernel World! ");
-    tty.putChar(byte);
-    tty.write("\n");
-    while (true) {}
+    main() catch |err| {
+        Terminal.print("Error: {}", .{err});
+    };
+
+    while (true) {
+        asm volatile ("hlt");
+    }
 }
